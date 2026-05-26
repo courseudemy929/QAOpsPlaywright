@@ -40,7 +40,8 @@ async SubmitAndGetOrderId()
 {
  await this.submit.click();
  await expect(this.orderConfirmationText).toHaveText(" Thankyou for the order. ");
- return await this.orderId.textContent();
+ return await this.orderId.first().textContent();
+ //return await this.orderId.textContent();
 }
 }
 module.exports = {OrdersReviewPage};

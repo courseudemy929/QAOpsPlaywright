@@ -22,7 +22,10 @@ test('@API Place the order', async ({page})=>
         window.localStorage.setItem('token',value);
     }, response.token );
 await page.goto("https://rahulshettyacademy.com/client");
- await page.locator("button[routerlink*='myorders']").click();
+//await page.waitForURL("**/client/#/user/dashboard");
+ await page.waitForURL("**/client/#/user/dashboard", { timeout: 60000 });
+await page.locator("button:has-text('ORDERS')").click();
+ //await page.locator("button[routerlink*='myorders']").click();
  await page.locator("tbody").waitFor();
 const rows = await page.locator("tbody tr");
 

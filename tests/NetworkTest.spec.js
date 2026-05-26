@@ -21,7 +21,7 @@ test('@SP Place the order', async ({ page }) => {
   }, response.token);
   await page.goto("https://rahulshettyacademy.com/client");
 
-
+await page.waitForURL("**/client/#/user/dashboard", { timeout: 60000 });
   await page.route("https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
     async route => {
       const response = await page.request.fetch(route.request());

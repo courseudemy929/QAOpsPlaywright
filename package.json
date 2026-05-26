@@ -14,6 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "@azure/identity": "^4.13.1",
+    "@azure/microsoft-playwright-testing": "^1.0.0-beta.9",
     "@azure/playwright": "^1.1.3",
     "@cucumber/cucumber": "*",
     "@playwright/test": "^1.59.1",

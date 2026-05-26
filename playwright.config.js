@@ -1,32 +1,51 @@
-// @ts-check
-const { devices } = require('@playwright/test');
+// ✅ Azure only activates when BOTH conditions are true
+const useAzure = !!(process.env.PLAYWRIGHT_SERVICE_ACCESS_TOKEN?.trim()) 
+&& process.env.USE_AZURE === 'true';
 
-const config = {
+console.log("Azure mode:", useAzure);
+//console.log("Token detected:", !!process.env.PLAYWRIGHT_SERVICE_ACCESS_TOKEN);
+
+const { defineConfig, devices } = require('@playwright/test');
+
+/**
+ * Core Local Playwright Configuration
+ */
+const playwrightConfig = defineConfig({
   testDir: './tests',
-  testMatch: '**/*.spec.js',
-  retries :0,
-  
-  /* Maximum time one test can run for. */
-  timeout: 30 * 1000,
-  expect: {
-  
-    timeout: 5000
-  },
-  
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  testMatch: '**/*.spec.js',
   use: {
-
-    browserName : 'chromium',
-    headless : true,
-    screenshot : 'on',
-    trace : 'on',//off,on
-    
-    
-    
+    trace: 'on-first-retry',
+    actionTimeout: 60000, 
   },
+  timeout: 60000,
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});
 
-
-};
-
-module.exports = config;
+/**
+ * Only try loading the Azure package if we are explicitly running 
+ * a cloud service test execution via the terminal.
+ */
+if (useAzure) {
+  try {
+    const { createAzurePlaywrightConfig } = require('@azure/playwright');
+    module.exports = createAzurePlaywrightConfig(playwrightConfig, {
+      serviceAuthType: 'ACCESS_TOKEN',
+      cloudWorkspaceUrl: 'https://eastus.api.playwright.microsoft.com/playwrightworkspaces/427cb6b2-2ca0-4413-a3b5-a147d5f4d01c'
+    });
+  } catch (e) {
+    console.log("Azure config error:", e.message);
+    module.exports = playwrightConfig;
+  }
+} else {
+  module.exports = playwrightConfig;
+}
