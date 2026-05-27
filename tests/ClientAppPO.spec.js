@@ -19,7 +19,7 @@ for(const data of dataset)
      const dashboardPage = poManager.getDashboardPage();
      await dashboardPage.searchProductAddCart(data.productName);
      await dashboardPage.navigateToCart();
-
+//this is just for testing for checkout and pull requests SAi_fixes
     const cartPage = poManager.getCartPage();
     await cartPage.VerifyProductIsDisplayed(data.productName);
     await cartPage.Checkout();
